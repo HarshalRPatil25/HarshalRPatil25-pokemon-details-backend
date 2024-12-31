@@ -43,6 +43,42 @@ public class UserController {
         }
     }
 
+    @GetMapping
+    public ResponseEntity<?> userDetails(){
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if(authentication != null && authentication.isAuthenticated()){
+                String username = authentication.getName();
+                return ResponseEntity.ok(userService.getUserDetails(username));
+            }else{
+                return ResponseEntity.status(401).body("Unauthorized access. Please log in.");
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("An internal error occurred. Please try again later.");
+        }
+    }
+
+
+    @PostMapping("/purchase-pokemon/{pokemonName}")     
+    public ResponseEntity<?> purchasePokemon(@PathVariable String pokemonName){
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if(authentication != null && authentication.isAuthenticated()){
+                String username = authentication.getName();
+                return ResponseEntity.ok(userService.purchasePokemon(username, pokemonName));
+            }else{
+                return ResponseEntity.status(401).body("Unauthorized access. Please log in.");
+            }
+        }
+        catch(ExceptionInInitializerError e){
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("An internal error occurred. Please try again later.");
+        }
+    }
+
+
 
   
     

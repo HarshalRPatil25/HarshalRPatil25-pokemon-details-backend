@@ -32,6 +32,9 @@ public class Pokemon {
     private boolean legendary;       // Whether the Pokémon is legendary or not
     private String imageUrl;  
  // URL for the Pokémon's image
+
+    private int purchasePrice;
+    
     @CreatedDate
     private Date addedDate;  
 

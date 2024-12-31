@@ -22,33 +22,40 @@ public class PublicService {
         if (newUser != null) {
             // Hash the password before saving
             newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+            newUser.setPoints(100);
             return userRepository.save(newUser);
         }
         return null;
     }
 
-    // Log in a user
     public ResponseLogin login(RequestLogin requestLogin) {
+        // Find the user by username
         User user = userRepository.findByUsername(requestLogin.getUsername());
-
-        // User not found
+    
         if (user == null) {
-            throw new IllegalArgumentException("User not found with username: " + requestLogin.getUsername());
+            throw new IllegalArgumentException("Invalid username or password.");
         }
-
-        // Password comparison
+    
+        // Validate password
         boolean isPasswordValid = passwordEncoder.matches(requestLogin.getPassword(), user.getPassword());
-
-        // If the password is valid
-        if (isPasswordValid) {
-            ResponseLogin responseLogin = new ResponseLogin();
-            responseLogin.setUsername(user.getUsername());
-            responseLogin.setRole(user.getRole());
-            // Do not return the plain password, for security reasons
-            return responseLogin;
+        if (!isPasswordValid) {
+            throw new IllegalArgumentException("Invalid username or password.");
         }
-
-        // If password doesn't match
-        return null;
+    
+        // If the password is valid
+        if (!user.isOncesLogin()) {
+            user.setOncesLogin(true);
+            user.setPoints(user.getPoints() + 50);
+            userRepository.save(user); // Persist the updated user
+        }
+    
+        // Construct the response
+        ResponseLogin responseLogin = new ResponseLogin();
+        responseLogin.setUsername(user.getUsername());
+        responseLogin.setRole(user.getRole());
+    
+        // Return response
+        return responseLogin;
     }
+    
 }
